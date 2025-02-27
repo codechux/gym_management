@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { toast } from "@/components/ui/toast";
+import { Toast } from "@/components/ui/toast";
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -60,9 +60,9 @@ export function NotificationForm() {
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
-      toast({
+      Toast({
         title: "Notification created",
-        description: "Your notification has been scheduled for delivery.",
+        content: "Your notification has been scheduled for delivery.",
       });
       form.reset();
     }, 1000);
