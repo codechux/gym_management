@@ -16,22 +16,21 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Match local version
+          node-version: 18 # Ensure this matches your local version
 
       - name: Install Dependencies
         run: npm install
 
       - name: Build and Export Next.js
-        run: npm run export
+        run: npm run build
 
-      - name: Deploy to Server
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy to Server using SCP
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-          rm -rf /var/www/html/*
-          exit
-          EOF
-
-          scp -o StrictHostKeyChecking=no -r out/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/html/
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -o StrictHostKeyChecking=no -r out/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/html/
 
       - name: Restart Nginx
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl restart nginx"
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "sudo systemctl restart nginx"
